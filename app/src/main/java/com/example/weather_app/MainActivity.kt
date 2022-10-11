@@ -4,14 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
+import android.widget.Button
+import android.content.Intent
+import com.example.weather_app.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var binding : ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        //load image in here..
-        val imageView: ImageView = findViewById( R.id.sunIcon )
-        Picasso.get().load("https://openweathermap.org/img/wn/01d@4x.png").into(imageView)
     }
 }

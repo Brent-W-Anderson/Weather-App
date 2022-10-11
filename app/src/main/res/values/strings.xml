@@ -7,4 +7,9 @@
     <string name="high_temp">High 80°</string>
     <string name="humidity">Humidity 100%</string>
     <string name="pressure">Pressure 1023 hPa</string>
+    <string name="weather_text">weather image</string>
+    <string name="forecast">Forecast</string>
+    <string name="date">Jan 31</string>
+    <string name="sunrise">Sunrise 8:00am</string>
+    <string name="sunset">Sunset 9:00pm</string>
 </resources>
