@@ -1,11 +1,13 @@
 package com.example.forecast
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,21 +16,31 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 
 @Composable
 fun HomeScreen(
+    viewModel: CurrentConditionsViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val state by viewModel.currentConditions.collectAsState(null)
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchData()
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ActionBar()
-        CurrentConditions()
-        ForecastButton( navController )
+        state?.let {
+            CurrentConditionsContent(it)
+            ForecastButton( navController )
+        }
     }
 }
 
@@ -46,7 +58,9 @@ fun ActionBar() {
 }
 
 @Composable
-fun CurrentConditions() {
+fun CurrentConditionsContent(
+    currentConditions: CurrentConditions
+) {
     Text(
         text = stringResource( R.string.city_state ),
         modifier = Modifier.padding( top = 16.dp ),
@@ -60,37 +74,37 @@ fun CurrentConditions() {
         ) {
             Column() {
                 Text(
-                    text = stringResource( R.string.temp ),
+                    text = stringResource( R.string.temp, currentConditions.conditions.temperature.toInt() ),
                     fontSize = 42.sp
                 )
                 Text(
-                    text = stringResource( R.string.feels_like ),
+                    text = stringResource( R.string.feels_like, currentConditions.conditions.feelsLike.toInt() ),
                     fontSize = 14.sp
                 )
             }
-            Image(
-                painter = rememberAsyncImagePainter( stringResource( R.string.img_url ) ),
+            AsyncImage(
+                model = String.format("https://openweathermap.org/img/wn/%s@4x.png", currentConditions.weatherData.firstOrNull()?.iconName),
                 contentDescription = null,
                 modifier = Modifier.size( 128.dp )
             )
         }
         Text(
-            text = stringResource( R.string.low_temp ),
+            text = stringResource( R.string.low_temp, currentConditions.conditions.minTemp.toInt() ),
             fontSize = 16.sp,
             modifier = Modifier.padding( start = 32.dp )
         )
         Text(
-            text = stringResource( R.string.high_temp ),
+            text = stringResource( R.string.high_temp, currentConditions.conditions.maxTemp.toInt() ),
             fontSize = 16.sp,
             modifier = Modifier.padding( start = 32.dp )
         )
         Text(
-            text = stringResource( R.string.humidity ),
+            text = stringResource( R.string.humidity, currentConditions.conditions.humidity.toInt() ) + "%",
             fontSize = 16.sp,
             modifier = Modifier.padding( start = 32.dp )
         )
         Text(
-            text = stringResource( R.string.pressure ),
+            text = stringResource( R.string.pressure, currentConditions.conditions.pressure.toInt() ),
             fontSize = 16.sp,
             modifier = Modifier.padding( start = 32.dp )
         )
