@@ -6,10 +6,11 @@ import retrofit2.http.Query
 
 interface OpenWeatherMapApi {
 
-    @GET("data/2.5/weather")
+    @GET("data/2.5/forecast/daily")
     suspend fun getCurrentConditions(
-        @Query("zip") zip: String,
+        @Query("zip") zip: Int,
         @Query("appid") apikey: String,
+        @Query("cnt") count: Int,
         @Query("units") units: String = "imperial"
     ) : CurrentConditions
 }
