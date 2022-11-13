@@ -17,7 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 
@@ -51,13 +52,13 @@ fun ForecastContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ForecastItem(
-                i,
+                currentConditions.conditions[i].dt,
                 currentConditions.conditions[i].weather[0].icon,
                 currentConditions.conditions[i].temp.day.toInt(),
                 currentConditions.conditions[i].temp.max.toInt(),
                 currentConditions.conditions[i].temp.min.toInt(),
-                currentConditions.conditions[i].sunrise.toString(),
-                currentConditions.conditions[i].sunset.toString(),
+                currentConditions.conditions[i].sunrise,
+                currentConditions.conditions[i].sunset,
             )
         }
         Divider(color = Color.Gray, thickness = 0.5.dp)
@@ -80,17 +81,25 @@ fun ForecastActionBar() {
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun ForecastItem(
-    day: Int,
+    dt: Long,
     imgUrl: String,
     temp: Int,
     high: Int,
     low: Int,
-    sunrise: String,
-    sunset: String
+    sunrise: Long,
+    sunset: Long
 ) {
-    val date = LocalDate.now().plusDays(day.toLong())
-    val formatter = DateTimeFormatter.ofPattern("MMM dd")
-    val formatted = date.format(formatter)
+    fun Long.toMonthDay(): String{
+        val formatter = DateTimeFormatter.ofPattern("MMM dd")
+        val dateTime = LocalDateTime.ofEpochSecond(this,0, ZoneOffset.of("-5"))
+        return formatter.format(dateTime)
+    }
+
+    fun Long.toHourMinute(): String{
+        val formatter = DateTimeFormatter.ofPattern("h:mm a")
+        val dateTime = LocalDateTime.ofEpochSecond(this,0, ZoneOffset.of("-5"))
+        return formatter.format(dateTime)
+    }
 
     AsyncImage(
         model = "https://openweathermap.org/img/wn/$imgUrl@2x.png",
@@ -98,7 +107,7 @@ fun ForecastItem(
         modifier = Modifier.size( 64.dp )
     )
     Text(
-        text = formatted.toString(),
+        text = dt.toMonthDay(),
         fontSize = 14.sp
     )
     Column( modifier = Modifier.padding(horizontal = 16.dp) ) {
@@ -123,11 +132,11 @@ fun ForecastItem(
         horizontalAlignment = Alignment.End
     ) {
         Text(
-            text = "Sunrise: 8:00am",
+            text = sunrise.toHourMinute(),
             fontSize = 14.sp
         )
         Text(
-            text = "Sunset: 8:00pm",
+            text = sunset.toHourMinute(),
             fontSize = 14.sp
         )
     }

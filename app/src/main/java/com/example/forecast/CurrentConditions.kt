@@ -22,6 +22,7 @@ data class FeelsLikeData(
 )
 
 data class CurrentConditionsData(
+    @Json(name = "dt") val dt: Long,
     @Json(name = "sunrise") val sunrise: Long,
     @Json(name = "sunset") val sunset: Long,
     @Json(name = "weather") val weather: List<WeatherData>,
