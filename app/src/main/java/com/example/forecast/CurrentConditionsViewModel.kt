@@ -15,8 +15,13 @@ class CurrentConditionsViewModel @Inject constructor(private val api: OpenWeathe
 
     public val currentConditions: Flow<CurrentConditions> = _currentConditions.receiveAsFlow()
 
-    fun fetchData() = runBlocking {
-        val currentConditions = api.getCurrentConditions(54016, "d9b12b3beed50ad8f61761ed87b3ad76", 16)
+    fun fetchData( lat: Double, lon: Double ) = runBlocking {
+        val currentConditions = api.getCurrentConditions(
+            lat,
+            lon,
+            "d9b12b3beed50ad8f61761ed87b3ad76",
+            16
+        )
         _currentConditions.trySend(currentConditions)
     }
 }

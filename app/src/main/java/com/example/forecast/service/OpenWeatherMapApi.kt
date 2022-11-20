@@ -8,7 +8,8 @@ interface OpenWeatherMapApi {
 
     @GET("data/2.5/forecast/daily")
     suspend fun getCurrentConditions(
-        @Query("zip") zip: Int,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
         @Query("appid") apikey: String,
         @Query("cnt") count: Int,
         @Query("units") units: String = "imperial"

@@ -50,4 +50,7 @@
 
     <!-- forecast button -->
     <string name="forecast">Forecast</string>
+
+    <!-- location button -->
+    <string name="getCondition">Current Conditions</string>
 </resources>

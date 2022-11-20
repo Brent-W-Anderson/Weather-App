@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,15 +19,23 @@ import coil.compose.AsyncImage
 @Composable
 fun HomeScreen(
     currentConditions: CurrentConditions,
-    navController: NavController
+    navController: NavController,
+    hasLocationPermission: Boolean,
+//    latitudeLongitude: LatitudeLongitude,
+    goToNext: MutableState<Boolean>
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ActionBar()
-        CurrentConditionsContent(currentConditions)
-        ForecastButton( navController )
+        if( goToNext.value ) {
+            CurrentConditionsContent(currentConditions)
+            ForecastButton( navController )
+        }
+        else {
+            LocationButton( goToNext )
+        }
     }
 }
 
@@ -106,5 +115,15 @@ fun ForecastButton( navController: NavController ) {
         modifier = Modifier.padding( top = 16.dp )
     ) {
         Text(text = stringResource( R.string.forecast ))
+    }
+}
+
+@Composable
+fun LocationButton( goToNext: MutableState<Boolean> ) {
+    Button(
+        onClick = { goToNext.value = true },
+        modifier = Modifier.padding( top = 16.dp )
+    ) {
+        Text(text = stringResource( R.string.getCondition ))
     }
 }
