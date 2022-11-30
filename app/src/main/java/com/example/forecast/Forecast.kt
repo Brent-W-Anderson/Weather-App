@@ -1,6 +1,7 @@
 package com.example.forecast
 
-import androidx.compose.foundation.Image
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,13 +14,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
+
+@RequiresApi(Build.VERSION_CODES.N)
 @Composable
-fun Forecast() {
+fun Forecast(
+        currentConditions: CurrentConditions,
+    ) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -28,86 +35,33 @@ fun Forecast() {
             .verticalScroll(state = scrollState)
     ){
         ForecastActionBar()
+        ForecastContent(currentConditions)
+    }
+}
 
-        // Copy 4 of the same rows 4 times, so we have 16 forecast items.
-        // These could be randomly generated values, but I wasn't sure if we were still using the strings.xml
-        for( i in 1..4 ) {
-            // day 1 forecast condition
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                ForecastItem(
-                    stringResource( R.string.day1_img_url ),
-                    stringResource( R.string.day1_date ),
-                    stringResource( R.string.day1_temp ),
-                    stringResource( R.string.day1_high_temp ),
-                    stringResource( R.string.day1_low_temp ),
-                    stringResource( R.string.day1_sunrise ),
-                    stringResource( R.string.day1_sunset )
-                )
-            }
-            Divider(color = Color.Gray, thickness = 0.5.dp)
-
-            // day 2 forecast condition
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                ForecastItem(
-                    stringResource( R.string.day2_img_url ),
-                    stringResource( R.string.day2_date ),
-                    stringResource( R.string.day2_temp ),
-                    stringResource( R.string.day2_high_temp ),
-                    stringResource( R.string.day2_low_temp ),
-                    stringResource( R.string.day2_sunrise ),
-                    stringResource( R.string.day2_sunset )
-                )
-            }
-            Divider(color = Color.Gray, thickness = 0.5.dp)
-
-            // day 3 forecast condition
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                ForecastItem(
-                    stringResource( R.string.day3_img_url ),
-                    stringResource( R.string.day3_date ),
-                    stringResource( R.string.day3_temp ),
-                    stringResource( R.string.day3_high_temp ),
-                    stringResource( R.string.day3_low_temp ),
-                    stringResource( R.string.day3_sunrise ),
-                    stringResource( R.string.day3_sunset )
-                )
-            }
-            Divider(color = Color.Gray, thickness = 0.5.dp)
-
-            // day 4 forecast condition
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                ForecastItem(
-                    stringResource( R.string.day4_img_url ),
-                    stringResource( R.string.day4_date ),
-                    stringResource( R.string.day4_temp ),
-                    stringResource( R.string.day4_high_temp ),
-                    stringResource( R.string.day4_low_temp ),
-                    stringResource( R.string.day4_sunrise ),
-                    stringResource( R.string.day4_sunset )
-                )
-            }
-            Divider(color = Color.Gray, thickness = 0.5.dp)
+@RequiresApi(Build.VERSION_CODES.N)
+@Composable
+fun ForecastContent(
+    currentConditions: CurrentConditions
+) {
+    for( i in 0 until currentConditions.count) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ForecastItem(
+                currentConditions.conditions[i].dt,
+                currentConditions.conditions[i].weather[0].icon,
+                currentConditions.conditions[i].temp.day.toInt(),
+                currentConditions.conditions[i].temp.max.toInt(),
+                currentConditions.conditions[i].temp.min.toInt(),
+                currentConditions.conditions[i].sunrise,
+                currentConditions.conditions[i].sunset,
+            )
         }
+        Divider(color = Color.Gray, thickness = 0.5.dp)
     }
 }
 
@@ -124,39 +78,52 @@ fun ForecastActionBar() {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun ForecastItem(
+    dt: Long,
     imgUrl: String,
-    date: String,
-    temp: String,
-    high: String,
-    low: String,
-    sunrise: String,
-    sunset: String
+    temp: Int,
+    high: Int,
+    low: Int,
+    sunrise: Long,
+    sunset: Long
 ) {
-    Image(
-        painter = rememberAsyncImagePainter( imgUrl ),
+    fun Long.toMonthDay(): String{
+        val formatter = DateTimeFormatter.ofPattern("MMM dd")
+        val dateTime = LocalDateTime.ofEpochSecond(this,0, ZoneOffset.of("-5"))
+        return formatter.format(dateTime)
+    }
+
+    fun Long.toHourMinute(): String{
+        val formatter = DateTimeFormatter.ofPattern("h:mm a")
+        val dateTime = LocalDateTime.ofEpochSecond(this,0, ZoneOffset.of("-5"))
+        return formatter.format(dateTime)
+    }
+
+    AsyncImage(
+        model = "https://openweathermap.org/img/wn/$imgUrl@2x.png",
         contentDescription = null,
         modifier = Modifier.size( 64.dp )
     )
     Text(
-        text = date,
+        text = dt.toMonthDay(),
         fontSize = 14.sp
     )
     Column( modifier = Modifier.padding(horizontal = 16.dp) ) {
         Text(
-            text = temp,
+            text = stringResource( R.string.temp, temp ),
             fontSize = 14.sp
         )
         Text(
-            text = high,
+            text = stringResource( R.string.high_temp, high ),
             fontSize = 14.sp
         )
     }
     Column( modifier = Modifier.padding(end = 16.dp) ) {
         Spacer( modifier = Modifier.height( 16.dp) )
         Text(
-            text = low,
+            text = stringResource( R.string.low_temp, low ),
             fontSize = 14.sp
         )
     }
@@ -165,18 +132,12 @@ fun ForecastItem(
         horizontalAlignment = Alignment.End
     ) {
         Text(
-            text = sunrise,
+            text = sunrise.toHourMinute(),
             fontSize = 14.sp
         )
         Text(
-            text = sunset,
+            text = sunset.toHourMinute(),
             fontSize = 14.sp
         )
     }
-}
-
-@Composable
-@Preview( showBackground = true )
-fun ForecastPreview() {
-    Forecast()
 }

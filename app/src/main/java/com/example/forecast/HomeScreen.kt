@@ -1,6 +1,5 @@
 package com.example.forecast
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -11,15 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 
 @Composable
 fun HomeScreen(
+    currentConditions: CurrentConditions,
     navController: NavController
 ) {
     Column(
@@ -27,7 +25,7 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ActionBar()
-        CurrentConditions()
+        CurrentConditionsContent(currentConditions)
         ForecastButton( navController )
     }
 }
@@ -46,9 +44,11 @@ fun ActionBar() {
 }
 
 @Composable
-fun CurrentConditions() {
+fun CurrentConditionsContent(
+    currentConditions: CurrentConditions
+) {
     Text(
-        text = stringResource( R.string.city_state ),
+        text = currentConditions.city.name + ", " + currentConditions.city.country,
         modifier = Modifier.padding( top = 16.dp ),
         fontSize = 14.sp
     )
@@ -60,37 +60,37 @@ fun CurrentConditions() {
         ) {
             Column() {
                 Text(
-                    text = stringResource( R.string.temp ),
+                    text = stringResource( R.string.temp, currentConditions.conditions[0].temp.day.toInt() ),
                     fontSize = 42.sp
                 )
                 Text(
-                    text = stringResource( R.string.feels_like ),
+                    text = stringResource( R.string.feels_like, currentConditions.conditions[0].feelsLike.day.toInt() ),
                     fontSize = 14.sp
                 )
             }
-            Image(
-                painter = rememberAsyncImagePainter( stringResource( R.string.img_url ) ),
+            AsyncImage(
+                model = String.format("https://openweathermap.org/img/wn/%s@4x.png", currentConditions.conditions[0].weather[0].icon),
                 contentDescription = null,
                 modifier = Modifier.size( 128.dp )
             )
         }
         Text(
-            text = stringResource( R.string.low_temp ),
+            text = stringResource( R.string.low_temp, currentConditions.conditions[0].temp.min.toInt() ),
             fontSize = 16.sp,
             modifier = Modifier.padding( start = 32.dp )
         )
         Text(
-            text = stringResource( R.string.high_temp ),
+            text = stringResource( R.string.high_temp, currentConditions.conditions[0].temp.max.toInt() ),
             fontSize = 16.sp,
             modifier = Modifier.padding( start = 32.dp )
         )
         Text(
-            text = stringResource( R.string.humidity ),
+            text = stringResource( R.string.humidity, currentConditions.conditions[0].humidity.toInt() ) + "%",
             fontSize = 16.sp,
             modifier = Modifier.padding( start = 32.dp )
         )
         Text(
-            text = stringResource( R.string.pressure ),
+            text = stringResource( R.string.pressure, currentConditions.conditions[0].pressure.toInt() ),
             fontSize = 16.sp,
             modifier = Modifier.padding( start = 32.dp )
         )
@@ -107,12 +107,4 @@ fun ForecastButton( navController: NavController ) {
     ) {
         Text(text = stringResource( R.string.forecast ))
     }
-}
-
-@Composable
-@Preview( showBackground = true )
-fun HomeScreenPreview() {
-    HomeScreen(
-        navController = rememberNavController()
-    )
 }

@@ -5,13 +5,12 @@
     <string name="city_state">St. Paul, MN</string>
 
     <!-- current conditions -->
-    <string name="img_url">https://openweathermap.org/img/wn/11n@4x.png</string>
-    <string name="temp">72°</string>
-    <string name="feels_like">Feels like 78°</string>
-    <string name="low_temp">Low 65°</string>
-    <string name="high_temp">High 80°</string>
-    <string name="humidity">Humidity 100%</string>
-    <string name="pressure">Pressure 1023 hPa</string>
+    <string name="temp">%s°</string>
+    <string name="feels_like">Feels like %d°</string>
+    <string name="low_temp">Low %d°</string>
+    <string name="high_temp">High %d°</string>
+    <string name="humidity">Humidity %d</string>
+    <string name="pressure">Pressure %d hPa</string>
 
     <!-- day 1 -->
     <string name="day1_img_url">https://openweathermap.org/img/wn/01d@4x.png</string>

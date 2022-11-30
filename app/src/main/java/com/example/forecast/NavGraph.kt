@@ -1,14 +1,25 @@
 package com.example.forecast
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
 @Composable
 fun SetupNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: CurrentConditionsViewModel = hiltViewModel()
 ) {
+    val state by viewModel.currentConditions.collectAsState(null)
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchData()
+    }
+
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route
@@ -16,12 +27,12 @@ fun SetupNavGraph(
         composable(
             route = Screen.Home.route
         ) {
-            HomeScreen( navController )
+            state?.let { HomeScreen(it, navController ) }
         }
         composable(
             route = Screen.Forecast.route
         ) {
-            Forecast()
+            state?.let { Forecast(it) }
         }
     }
 }
